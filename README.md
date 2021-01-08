@@ -1,7 +1,7 @@
 # BER-TLV
 
 [![Build Status](https://travis-ci.org/skythen/bertlv.svg?branch=master)](https://travis-ci.org/skythen/bertlv)
-[![Coverage Status](https://coveralls.io/repos/github/bertlv/badge.svg)](https://coveralls.io/github/skythen/bertlv)
+[![Coverage Status](https://coveralls.io/repos/github/skythen/bertlv/badge.svg?branch=master)](https://coveralls.io/github/skythen/bertlv?branch=master)
 [![GoDoc](https://godoc.org/github.com/skythen/bertlv?status.svg)](http://godoc.org/github.com/skythen/bertlv)
 [![Go Report Card](https://goreportcard.com/badge/github.com/skythen/bertlv)](https://goreportcard.com/report/github.com/skythen/bertlv)
 
