@@ -6,25 +6,26 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"github.com/pkg/errors"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 const (
 	packageTag string = "skythen/bertlv"
 )
 
-// BerTag represents the tag of a BER-TLV structure
+// BerTag represents the tag of a BER-TLV structure.
 type BerTag []byte
 
-// BerTLV represents a BER-TLV structure
+// BerTLV represents a BER-TLV structure.
 type BerTLV struct {
 	Tag      BerTag
 	Value    []byte
 	children []BerTLV
 }
 
-// BerTLVs is a slice of BerTLV
+// BerTLVs is a slice of BerTLV.
 type BerTLVs []BerTLV
 
 // Builder is used for building BER-TLV structures. Use the Add functions to add data.
@@ -486,6 +487,7 @@ func (bu Builder) AddEmpty(tag BerTag) *Builder {
 // AddRaw adds the given bytes without further checks to the Builder.
 func (bu Builder) AddRaw(b []byte) *Builder {
 	bu.bytes = append(bu.bytes, b...)
+
 	return &bu
 }
 
