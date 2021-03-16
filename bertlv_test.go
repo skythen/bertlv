@@ -3,8 +3,9 @@ package bertlv
 import (
 	"bytes"
 	"fmt"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestNewBerTLV(t *testing.T) {
@@ -53,15 +54,17 @@ func TestNewBerTLV(t *testing.T) {
 
 			if err != nil && !tc.expectError {
 				t.Errorf("Expected: no error, got: error(%v)", err.Error())
+
 				return
 			}
 
 			if err == nil && tc.expectError {
 				t.Errorf("Expected: error, got: no error")
+
 				return
 			}
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -84,7 +87,7 @@ func TestNewOneByteTag(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := NewOneByteTag(tc.inputByte)
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -109,7 +112,7 @@ func TestNewTwoByteTag(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := NewTwoByteTag(tc.inputByte1, tc.inputByte2)
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -136,7 +139,7 @@ func TestNewThreeByteTag(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := NewThreeByteTag(tc.inputByte1, tc.inputByte2, tc.inputByte3)
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -308,15 +311,17 @@ func TestParse(t *testing.T) {
 			received, err := Parse(tc.inputBytes)
 			if err != nil && !tc.expectError {
 				t.Errorf("Expected: no error, got: error(%v)", err.Error())
+
 				return
 			}
 
 			if err == nil && tc.expectError {
 				t.Errorf("Expected: error, got: no error")
+
 				return
 			}
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -363,11 +368,13 @@ func TestBerTag_CheckEncoding(t *testing.T) {
 			err := tc.input.CheckEncoding()
 			if err != nil && !tc.expectError {
 				t.Errorf("Expected: no error, got: error(%v)", err.Error())
+
 				return
 			}
 
 			if err == nil && tc.expectError {
 				t.Errorf("Expected: error, got: no error")
+
 				return
 			}
 		})
@@ -464,7 +471,7 @@ func TestBerTLVs_Bytes(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.berTLVs.Bytes()
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -537,7 +544,7 @@ func TestBerTLVs_FindAllWithTag(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.berTLVs.FindAllWithTag(tc.inputTag)
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -609,7 +616,7 @@ func TestBerTLVs_FindFirstWithTag(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.berTLVs.FindFirstWithTag(tc.inputTag)
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -937,7 +944,7 @@ func TestBerTLV_FirstChild(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.tlv.FirstChild(tc.inputTag)
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -1027,7 +1034,7 @@ func TestBerTLV_Children(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.berTLV.Children(tc.inputTag)
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -1078,7 +1085,7 @@ func TestBuilder_AddByte(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := Builder{}.AddByte(tc.inputTag, tc.inputByte).Bytes()
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -1110,7 +1117,7 @@ func TestBuilder_AddBytes(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := Builder{}.AddBytes(tc.inputTag, tc.inputBytes).Bytes()
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -1133,7 +1140,7 @@ func TestBuilder_AddEmpty(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := Builder{}.AddEmpty(tc.inputTag).Bytes()
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -1156,7 +1163,7 @@ func TestBuilder_AddRaw(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := Builder{}.AddRaw(tc.inputBytes).Bytes()
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -1205,15 +1212,17 @@ func TestBuilder_BuildBerTLVs(t *testing.T) {
 
 			if err != nil && !tc.expectError {
 				t.Errorf("Expected: no error, got: error(%v)", err.Error())
+
 				return
 			}
 
 			if err == nil && tc.expectError {
 				t.Errorf("Expected: error, got: no error")
+
 				return
 			}
 
-			if !reflect.DeepEqual(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
