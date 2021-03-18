@@ -64,7 +64,7 @@ func TestNewBerTLV(t *testing.T) {
 				return
 			}
 
-			if !cmp.Equal(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected, cmp.AllowUnexported(BerTLV{})) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -321,7 +321,7 @@ func TestParse(t *testing.T) {
 				return
 			}
 
-			if !cmp.Equal(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected, cmp.AllowUnexported(BerTLV{})) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -544,7 +544,7 @@ func TestBerTLVs_FindAllWithTag(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.berTLVs.FindAllWithTag(tc.inputTag)
 
-			if !cmp.Equal(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected, cmp.AllowUnexported(BerTLV{})) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -616,7 +616,7 @@ func TestBerTLVs_FindFirstWithTag(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.berTLVs.FindFirstWithTag(tc.inputTag)
 
-			if !cmp.Equal(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected, cmp.AllowUnexported(BerTLV{})) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -944,7 +944,7 @@ func TestBerTLV_FirstChild(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.tlv.FirstChild(tc.inputTag)
 
-			if !cmp.Equal(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected, cmp.AllowUnexported(BerTLV{})) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -1034,7 +1034,7 @@ func TestBerTLV_Children(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			received := tc.berTLV.Children(tc.inputTag)
 
-			if !cmp.Equal(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected, cmp.AllowUnexported(BerTLV{})) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
@@ -1222,7 +1222,7 @@ func TestBuilder_BuildBerTLVs(t *testing.T) {
 				return
 			}
 
-			if !cmp.Equal(received, tc.expected) {
+			if !cmp.Equal(received, tc.expected, cmp.AllowUnexported(BerTLV{})) {
 				t.Errorf("Expected: '%v', got: '%v'", tc.expected, received)
 			}
 		})
