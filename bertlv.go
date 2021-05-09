@@ -48,7 +48,7 @@ func NewBerTLV(t BerTag, v []byte) (*BerTLV, error) {
 		for len(cpy) > 0 {
 			tlv, tlvLen, err := parseBerTLV(cpy)
 			if err != nil {
-				return nil, errors.Wrap(err, fmt.Sprintf("%s: failed to create new BerTLV because of invalid content of constructed object with tag %02X", packageTag, t))
+				return nil, errors.Wrap(err, fmt.Sprintf("%s: tag %02X invalid content", packageTag, t))
 			}
 
 			children = append(children, tlv)
@@ -87,7 +87,7 @@ func NewThreeByteTag(fb byte, sb byte, tb byte) BerTag {
 // Any errors that occur while parsing are returned.
 func Parse(b []byte) (BerTLVs, error) {
 	if len(b) == 0 {
-		return BerTLVs{}, fmt.Errorf("%s: failed to parse BER-TLVs - tlv has length 0", packageTag)
+		return BerTLVs{}, fmt.Errorf("%s: tlv has length 0", packageTag)
 	}
 
 	var result []BerTLV
@@ -117,7 +117,7 @@ func parseBerTLV(b []byte) (BerTLV, int, error) {
 	// get length of tag
 	t, err := parseTag(b)
 	if err != nil {
-		return BerTLV{}, 0, errors.Wrap(err, fmt.Sprintf("%s: failed to parse BER-TLV - invalid tag: %02X", packageTag, b))
+		return BerTLV{}, 0, errors.Wrap(err, fmt.Sprintf("tag %02X invalid", b))
 	}
 
 	tLen = len(t)
@@ -126,14 +126,13 @@ func parseBerTLV(b []byte) (BerTLV, int, error) {
 	// get length of length
 	l, lLen, err = parseLength(b[tLen:])
 	if err != nil {
-		return BerTLV{}, 0, errors.Wrap(err, fmt.Sprintf("%s: failed to parse BER-TLV - tag %02X: invalid length encoding ", packageTag, t))
+		return BerTLV{}, 0, errors.Wrap(err, fmt.Sprintf("tag %02X invalid length encoding", t))
 	}
 
-	endIndex := len(b) - 1
 	indicatedEndIndex := tLen + lLen + l - 1
 
-	if indicatedEndIndex > endIndex {
-		return BerTLV{}, 0, fmt.Errorf("%s: failed to parse BER-TLV - tag %02X: indicated length of value is out of bounds. indicated end index: %d : actual end index %d", packageTag, t, indicatedEndIndex, endIndex)
+	if endIndex := len(b) - 1; indicatedEndIndex > endIndex {
+		return BerTLV{}, 0, fmt.Errorf("tag %02X indicated length of value is out of bounds - indicated end index: %d actual end index %d", t, indicatedEndIndex, endIndex)
 	}
 
 	// parse value
@@ -159,7 +158,7 @@ func parseBerTLV(b []byte) (BerTLV, int, error) {
 		for len(cv) > 0 {
 			tChild, cLen, err := parseBerTLV(cv)
 			if err != nil {
-				return BerTLV{}, 0, errors.Wrap(err, fmt.Sprintf("%s: failed to parse BER-TLV - tag %02X: error while parsing child TLV of constructed object", packageTag, t))
+				return BerTLV{}, 0, errors.Wrap(err, fmt.Sprintf("tag %02X invalid child object", t))
 			}
 
 			result.children = append(result.children, tChild)
@@ -173,12 +172,12 @@ func parseBerTLV(b []byte) (BerTLV, int, error) {
 func parseTag(b []byte) (BerTag, error) {
 	if b[0]&0x1F == 0x1F {
 		if len(b) < 2 {
-			return BerTag{}, errors.New("failed to parse tag - first byte indicates that tag is encoded with more than one byte, but following byte are missing")
+			return BerTag{}, errors.New("first byte indicates that tag is encoded with more than one byte, but following byte are missing")
 		}
 
 		if b[1]&0x80 == 0x80 {
 			if len(b) < 3 {
-				return BerTag{}, errors.New("failed to parse tag - first two byte indicate that tag is encoded with three byte, but following byte are missing")
+				return BerTag{}, errors.New("first two byte indicate that tag is encoded with three byte, but following byte are missing")
 			}
 
 			return NewThreeByteTag(b[0], b[1], b[2]), nil
@@ -202,7 +201,7 @@ func parseLength(b []byte) (int, int, error) {
 	// two byte length encoding for values between 128 - 255
 	if b[0] == 0x81 {
 		if len(b)-1 <= 0 {
-			return 0, 0, errors.New("failed to parse length - first byte indicates that length is encoded with two byte, but following byte are missing")
+			return 0, 0, errors.New("first byte indicates that length is encoded with two byte, but following byte are missing")
 		}
 
 		return int(b[1]), 2, nil
@@ -211,13 +210,13 @@ func parseLength(b []byte) (int, int, error) {
 	// three byte length encoding for values between 256 - 65535
 	if b[0] == 0x82 {
 		if len(b)-2 <= 0 {
-			return 0, 0, errors.New("failed to parse length - first byte indicates that length is encoded with three byte, but following byte are missing")
+			return 0, 0, errors.New("first byte indicates that length is encoded with three byte, but following byte are missing")
 		}
 
 		return int(binary.BigEndian.Uint16(b[1:3])), 3, nil
 	}
 
-	return 0, 0, errors.New("failed to parse length - if length is greater than 127, first byte must indicate encoding of length")
+	return 0, 0, errors.New("if length is greater than 127, first byte must indicate encoding of length")
 }
 
 func buildLen(l int) []byte {
@@ -247,20 +246,20 @@ func (t BerTag) CheckEncoding() error {
 
 	if l == 1 {
 		if t[0]&0x1F == 0x1F {
-			return errors.New("t consists of one byte but indicates that more byte follow")
+			return errors.New("tag consists of one byte but indicates that more byte follow")
 		}
 	} else {
 		if t[0]&0x1F != 0x1F {
-			return fmt.Errorf("t consists of %d byte but first byte does not indicate that more byte follow", len(t))
+			return fmt.Errorf("tag consists of %d byte but first byte does not indicate that more byte follow", len(t))
 		}
 
 		if l == 2 {
 			if t[1]&0x80 == 0x80 {
-				return errors.New("t consists of 2 byte but indicates that more byte follow")
+				return errors.New("tag consists of 2 byte but indicates that more byte follow")
 			}
 		} else {
 			if t[1]&0x80 != 0x80 {
-				return errors.New("t consists of 3 byte but second byte does not indicate that more byte follow")
+				return errors.New("tag consists of 3 byte but second byte does not indicate that more byte follow")
 			}
 		}
 	}
